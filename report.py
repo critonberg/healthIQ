@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import numpy as np
 from io import BytesIO
 
 # Sample Data Generation Function
@@ -14,7 +13,7 @@ def generate_sample_data():
         'Weight': (75 - (0.2 * pd.Series(range(30)))).tolist(),
         'Blood Pressure (Systolic)': (120 + (pd.Series(range(30)) % 5)).tolist(),
         'Blood Pressure (Diastolic)': (80 + (pd.Series(range(30)) % 3)).tolist(),
-        'Sleep (Hours)': np.random.uniform(5, 9, 30).tolist()  # More realistic sleep data
+        'Sleep (Hours)': (6 + (pd.Series(range(30)) % 3)).tolist()
     }
     return pd.DataFrame(data)
 
@@ -40,17 +39,19 @@ fig_weight = px.line(df, x='Date', y='Weight', title='Weight Trend', markers=Tru
 
 # Blood Pressure Area Chart
 fig_bp = px.area(df, x='Date', y=['Blood Pressure (Systolic)', 'Blood Pressure (Diastolic)'],
-                 title='Blood Pressure Trends', labels={'value': 'Blood Pressure (mmHg)', 'variable': 'Type'})
+                 title='Blood Pressure Trends', labels={'value': 'Blood Pressure (mmHg)', 'variable': 'Type'},
+                 markers=True)
 
-# Sleep Pattern Line Chart (Fix)
-fig_sleep_line = px.line(df, x='Date', y='Sleep (Hours)', title='Sleep Duration Over Time', markers=True)
+# Sleep Pattern Violin Plot
+fig_sleep = px.violin(df, y='Sleep (Hours)', box=True, points='all',
+                      title='Sleep Pattern Distribution',
+                      labels={'Sleep (Hours)': 'Hours of Sleep'})
 
-# Display Charts
 st.plotly_chart(fig_steps)
 st.plotly_chart(fig_heart)
 st.plotly_chart(fig_weight)
 st.plotly_chart(fig_bp)
-st.plotly_chart(fig_sleep_line)  # Corrected sleep chart reference
+st.plotly_chart(fig_sleep)
 
 # Data Table
 st.subheader("Detailed Breakdown")
@@ -70,11 +71,3 @@ st.download_button(
     file_name="fitness_report.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
-
-# Goal Setting Section
-st.sidebar.header("Set Your Health Goals")
-steps_goal = st.sidebar.number_input("Daily Steps Goal", min_value=1000, value=10000, step=500)
-weight_goal = st.sidebar.number_input("Target Weight (kg)", min_value=30.0, max_value=200.0, value=70.0, step=0.5)
-sleep_goal = st.sidebar.number_input("Daily Sleep Goal (hours)", min_value=4.0, max_value=12.0, value=8.0, step=0.5)
-
-st.sidebar.write(f"**Your Goals:**\n - Steps: {steps_goal}\n - Weight: {weight_goal} kg\n - Sleep: {sleep_goal} hours")
