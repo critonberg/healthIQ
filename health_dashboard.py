@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import numpy as np
 from io import BytesIO
+import xlsxwriter
 
 # Sample Data Generation Function
 def generate_sample_data():
