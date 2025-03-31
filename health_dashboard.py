@@ -3,7 +3,6 @@ import pandas as pd
 import plotly.express as px
 import numpy as np
 from io import BytesIO
-import xlsxwriter
 
 # Sample Data Generation Function
 def generate_sample_data():
@@ -30,7 +29,8 @@ st.subheader("Summary")
 st.metric(label="Average Steps", value=int(df['Steps'].mean()))
 st.metric(label="Average Heart Rate", value=int(df['Heart Rate'].mean()))
 st.metric(label="Weight Change", value=f"{df['Weight'].iloc[-1] - df['Weight'].iloc[0]:.1f} kg")
-st.metric(label="Average Blood Pressure", value=f"{int(df['Blood Pressure (Systolic)'].mean())}/{int(df['Blood Pressure (Diastolic)'].mean())} mmHg")
+st.metric(label="Average Blood Pressure",
+          value=f"{int(df['Blood Pressure (Systolic)'].mean())}/{int(df['Blood Pressure (Diastolic)'].mean())} mmHg")
 st.metric(label="Average Sleep Duration", value=f"{df['Sleep (Hours)'].mean():.1f} hours")
 
 # Charts
@@ -43,7 +43,7 @@ fig_weight = px.line(df, x='Date', y='Weight', title='Weight Trend', markers=Tru
 fig_bp = px.area(df, x='Date', y=['Blood Pressure (Systolic)', 'Blood Pressure (Diastolic)'],
                  title='Blood Pressure Trends', labels={'value': 'Blood Pressure (mmHg)', 'variable': 'Type'})
 
-# Sleep Pattern Line Chart (Fix)
+# Sleep Pattern Line Chart
 fig_sleep_line = px.line(df, x='Date', y='Sleep (Hours)', title='Sleep Duration Over Time', markers=True)
 
 # Display Charts
@@ -51,17 +51,18 @@ st.plotly_chart(fig_steps)
 st.plotly_chart(fig_heart)
 st.plotly_chart(fig_weight)
 st.plotly_chart(fig_bp)
-st.plotly_chart(fig_sleep_line)  # Corrected sleep chart reference
+st.plotly_chart(fig_sleep_line)
 
 # Data Table
 st.subheader("Detailed Breakdown")
 st.dataframe(df)
 
-# Export to Excel Function
+# Export to Excel Function (Using openpyxl instead of xlsxwriter)
 def export_excel(data):
     buffer = BytesIO()
-    with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:  # Use openpyxl instead
         data.to_excel(writer, sheet_name='Report', index=False)
+    buffer.seek(0)  # Move pointer to the beginning
     return buffer.getvalue()
 
 # Excel Download Button
